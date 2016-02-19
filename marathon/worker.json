@@ -1,0 +1,49 @@
+{
+  "id": "/sentry/worker",
+  "cmd": "sentry celery worker",
+  "instances": 1,
+  "cpus": 1,
+  "mem": 1024,
+  "backoffSeconds": 1,
+  "backoffFactor": 1.15,
+  "maxLaunchDelaySeconds": 3600,
+  "labels": {
+    "owner": "sentry"
+  },
+  "container": {
+    "type": "DOCKER",
+    "docker": {
+      "image": "sentry:8.1.2",
+      "network": "BRIDGE",
+      "privileged": false,
+      "forcePullImage": false,
+      "parameters": [
+        { "key": "env", "value": "SENTRY_REDIS_HOST=redis-sentry.marathon" },
+        { "key": "env", "value": "SENTRY_POSTGRES_HOST=postgres-sentry.marathon" },
+        { "key": "env", "value": "SENTRY_DB_USER=sentry" },
+        { "key": "env", "value": "SENTRY_DB_PASSWORD=secret" },
+        { "key": "env", "value": "SENTRY_SECRET_KEY=secret-goes-here" }
+      ]
+    }
+  },
+  "healthChecks": [
+    {
+      "protocol": "COMMAND",
+      "command": {
+        "value": "true"
+      },
+      "gracePeriodSeconds": 120,
+      "intervalSeconds": 30,
+      "timeoutSeconds": 5,
+      "maxConsecutiveFailures": 3
+    }
+  ],
+  "upgradeStrategy": {
+    "minimumHealthCapacity": 0,
+    "maximumOverCapacity": 1
+  },
+  "dependencies": [
+    "/sentry/postgres",
+    "/sentry/redis"
+  ]
+}

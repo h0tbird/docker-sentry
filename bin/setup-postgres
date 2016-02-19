@@ -1,0 +1,14 @@
+#!/bin/bash
+
+[ $# -ne 2 ] && echo "Usage: $0 <IP_REDIS> <IP_POSTGRES>" && exit 1
+
+docker run -it --rm \
+--add-host redis-sentry.marathon:$1 \
+--add-host postgres-sentry.marathon:$2 \
+--env SENTRY_REDIS_HOST=redis-sentry.marathon \
+--env SENTRY_POSTGRES_HOST=postgres-sentry.marathon \
+--env SENTRY_DB_USER=sentry \
+--env SENTRY_DB_PASSWORD=secret \
+--env SENTRY_SECRET_KEY=secret-goes-here \
+sentry:8.1.2 \
+upgrade
